@@ -1,24 +1,52 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppShell } from "@/components/layout/AppShell";
+import { RightRail } from "@/components/layout/RightRail";
+import { Composer } from "@/components/feed/Composer";
+import { PostCard } from "@/components/feed/PostCard";
+import { feed } from "@/lib/mock-data";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const lanes = ["For you", "Professional", "Communities", "Trending", "Friends"] as const;
+
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <AppShell right={<RightRail />}>
+      <div className="flex items-baseline justify-between mb-4">
+        <h1 className="font-display text-3xl">Feed</h1>
+        <span className="text-xs text-muted-foreground">
+          Intent-ranked · <span className="text-signal">weekday · pro-leaning</span>
+        </span>
+      </div>
+
+      <div className="flex items-center gap-1 mb-4 rule-bottom pb-2 overflow-x-auto">
+        {lanes.map((l, i) => (
+          <button
+            key={l}
+            className={
+              "px-3 py-1.5 rounded-md text-sm whitespace-nowrap transition " +
+              (i === 0
+                ? "bg-card text-foreground border border-border"
+                : "text-muted-foreground hover:text-foreground")
+            }
+          >
+            {l}
+          </button>
+        ))}
+      </div>
+
+      <Composer />
+
+      <div className="mt-4 space-y-4">
+        {feed.map((p) => (
+          <PostCard key={p.id} post={p} />
+        ))}
+        <div className="text-center text-sm text-muted-foreground py-8">
+          You're caught up. Come back after lunch — the ranker will shift.
+        </div>
+      </div>
+    </AppShell>
   );
 }
