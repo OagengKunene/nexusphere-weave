@@ -1,5 +1,11 @@
 import { TrendingUp, UserPlus, Users, Calendar, Briefcase } from "lucide-react";
-import { trends, suggestedPeople, suggestedGroups, upcomingEvents, jobMatches } from "@/lib/mock-data";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { trends, suggestedGroups, upcomingEvents, jobMatches } from "@/lib/mock-data";
+import { fetchSuggestedPeople, fetchMyFollowing } from "@/lib/api";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar } from "./Avatar";
 
 export function RightRail() {
   return (
@@ -8,7 +14,9 @@ export function RightRail() {
         <ul className="divide-y divide-border">
           {trends.map((t) => (
             <li key={t.tag} className="py-2.5">
-              <div className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">{t.lane}</div>
+              <div className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+                {t.lane}
+              </div>
               <div className="font-medium">{t.tag}</div>
               <div className="text-xs text-muted-foreground">{t.posts} posts</div>
             </li>
@@ -16,29 +24,16 @@ export function RightRail() {
         </ul>
       </RailCard>
 
-      <RailCard title="People to know" icon={UserPlus}>
-        <ul className="space-y-3">
-          {suggestedPeople.map((p) => (
-            <li key={p.handle} className="flex items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="font-medium truncate">{p.name}</div>
-                <div className="text-xs text-muted-foreground truncate">{p.role}</div>
-                <div className="text-[0.68rem] text-muted-foreground">{p.mutual} mutual</div>
-              </div>
-              <button className="text-xs px-3 py-1 rounded-full border border-border hover:bg-accent transition">
-                Follow
-              </button>
-            </li>
-          ))}
-        </ul>
-      </RailCard>
+      <PeopleToKnow />
 
       <RailCard title="Groups for you" icon={Users}>
         <ul className="space-y-3">
           {suggestedGroups.map((g) => (
             <li key={g.name}>
               <div className="font-medium">{g.name}</div>
-              <div className="text-xs text-muted-foreground">{g.members} · {g.topic}</div>
+              <div className="text-xs text-muted-foreground">
+                {g.members} · {g.topic}
+              </div>
             </li>
           ))}
         </ul>
@@ -66,7 +61,9 @@ export function RightRail() {
                 <div className="font-medium truncate">{j.role}</div>
                 <span className="text-[0.68rem] text-signal font-medium">{j.match}%</span>
               </div>
-              <div className="text-xs text-muted-foreground">{j.company} · {j.location}</div>
+              <div className="text-xs text-muted-foreground">
+                {j.company} · {j.location}
+              </div>
               <div className="text-xs text-muted-foreground">{j.salary}</div>
             </li>
           ))}
@@ -74,9 +71,90 @@ export function RightRail() {
       </RailCard>
 
       <p className="text-[0.65rem] text-muted-foreground leading-relaxed">
-        NexSphere is a hybrid social network — professional identity, communities, and public conversation, ranked by intent.
+        NexSphere is a hybrid social network — professional identity, communities, and public
+        conversation, ranked by intent.
       </p>
     </>
+  );
+}
+
+function PeopleToKnow() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const { data: people } = useQuery({
+    queryKey: ["suggested-people", user?.id ?? "anon"],
+    queryFn: () => fetchSuggestedPeople(user?.id),
+  });
+  const { data: following } = useQuery({
+    queryKey: ["following", user?.id],
+    queryFn: () => (user ? fetchMyFollowing(user.id) : Promise.resolve([])),
+    enabled: !!user,
+  });
+
+  const toggle = useMutation({
+    mutationFn: async (targetId: string) => {
+      if (!user) throw new Error("Sign in to follow");
+      const isFollowing = following?.includes(targetId);
+      if (isFollowing) {
+        const { error } = await supabase
+          .from("follows")
+          .delete()
+          .eq("follower_id", user.id)
+          .eq("following_id", targetId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("follows")
+          .insert({ follower_id: user.id, following_id: targetId });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["following", user?.id] }),
+  });
+
+  return (
+    <RailCard title="People to know" icon={UserPlus}>
+      {(!people || people.length === 0) && (
+        <p className="text-xs text-muted-foreground">No one else has joined yet — invite someone.</p>
+      )}
+      <ul className="space-y-3">
+        {people?.map((p) => {
+          const isFollowing = following?.includes(p.id);
+          return (
+            <li key={p.id} className="flex items-center gap-3">
+              <Avatar name={p.name} hue={p.avatar_hue} size={36} />
+              <div className="min-w-0 flex-1">
+                <div className="font-medium truncate">{p.name}</div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {p.headline ?? `@${p.handle}`}
+                </div>
+              </div>
+              {user ? (
+                <button
+                  onClick={() => toggle.mutate(p.id)}
+                  disabled={toggle.isPending}
+                  className={
+                    "text-xs px-3 py-1 rounded-full border transition " +
+                    (isFollowing
+                      ? "border-signal text-signal"
+                      : "border-border hover:bg-accent")
+                  }
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              ) : (
+                <Link
+                  to="/auth"
+                  className="text-xs px-3 py-1 rounded-full border border-border hover:bg-accent"
+                >
+                  Follow
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </RailCard>
   );
 }
 
