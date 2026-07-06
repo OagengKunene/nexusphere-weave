@@ -93,6 +93,12 @@ export function AppShell({
 }
 
 function TopBar() {
+  const { user, profile, loading } = useAuth();
+  const [open, setOpen] = useState(false);
+  async function signOut() {
+    await supabase.auth.signOut();
+    setOpen(false);
+  }
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 rule-bottom">
       <div className="mx-auto max-w-[1440px] px-4 lg:px-8 h-16 flex items-center gap-6">
@@ -114,13 +120,51 @@ function TopBar() {
             <span className="signal-dot" />
             Live
           </span>
-          <div
-            className="h-9 w-9 rounded-full grid place-items-center font-display text-sm"
-            style={{ background: "oklch(0.32 0.08 60)", color: "oklch(0.96 0.06 60)" }}
-            aria-label="Your profile"
-          >
-            SA
-          </div>
+          {loading ? null : user ? (
+            <div className="relative">
+              <button
+                onClick={() => setOpen((v) => !v)}
+                className="h-9 w-9 rounded-full grid place-items-center font-display text-sm"
+                style={{
+                  background: `oklch(0.32 0.08 ${profile?.avatar_hue ?? 60})`,
+                  color: "oklch(0.96 0.06 60)",
+                }}
+                aria-label="Your account"
+              >
+                {(profile?.name ?? user.email ?? "?").slice(0, 2).toUpperCase()}
+              </button>
+              {open && (
+                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-md p-2 text-sm shadow-lg">
+                  <div className="px-2 py-1.5">
+                    <div className="font-medium truncate">{profile?.name ?? "You"}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      @{profile?.handle ?? user.email}
+                    </div>
+                  </div>
+                  <Link
+                    to="/profile"
+                    onClick={() => setOpen(false)}
+                    className="block px-2 py-1.5 rounded hover:bg-accent"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={signOut}
+                    className="w-full text-left px-2 py-1.5 rounded hover:bg-accent text-heat"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="text-sm px-4 py-1.5 rounded-md bg-signal text-signal-foreground font-medium hover:brightness-95"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </div>
     </header>
