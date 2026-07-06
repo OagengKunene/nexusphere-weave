@@ -14,7 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
+      }
+      likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          kind: string
+          lane: string
+          tags: string[] | null
+          title: string | null
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          kind?: string
+          lane?: string
+          tags?: string[] | null
+          title?: string | null
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          lane?: string
+          tags?: string[] | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_hue: number
+          bio: string | null
+          created_at: string
+          handle: string
+          headline: string | null
+          id: string
+          location: string | null
+          name: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          avatar_hue?: number
+          bio?: string | null
+          created_at?: string
+          handle: string
+          headline?: string | null
+          id: string
+          location?: string | null
+          name: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          avatar_hue?: number
+          bio?: string | null
+          created_at?: string
+          handle?: string
+          headline?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
