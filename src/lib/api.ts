@@ -131,19 +131,22 @@ export async function fetchEvents(): Promise<DbEvent[]> {
 
 // ================= MESSAGES =================
 
+export type MemberProfile = {
+  id: string;
+  name: string;
+  handle: string;
+  avatar_hue: number;
+};
+
 export type DbConversation = {
   id: string;
   is_group: boolean;
   title: string | null;
   last_message_at: string;
-  conversation_members: {
-    user_id: string;
-    profiles: { id: string; name: string; handle: string; avatar_hue: number } | null;
-  }[];
+  members: MemberProfile[];
 };
 
 export async function fetchConversations(userId: string): Promise<DbConversation[]> {
-  // First get conversation ids the user belongs to.
   const { data: mine, error: e1 } = await supabase
     .from("conversation_members")
     .select("conversation_id")
@@ -152,15 +155,34 @@ export async function fetchConversations(userId: string): Promise<DbConversation
   const ids = (mine ?? []).map((r) => r.conversation_id as string);
   if (ids.length === 0) return [];
 
-  const { data, error } = await supabase
+  const { data: convs, error: e2 } = await supabase
     .from("conversations")
-    .select(
-      "id, is_group, title, last_message_at, conversation_members(user_id, profiles!conversation_members_user_id_fkey(id, name, handle, avatar_hue))",
-    )
+    .select("id, is_group, title, last_message_at")
     .in("id", ids)
     .order("last_message_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []) as unknown as DbConversation[];
+  if (e2) throw e2;
+
+  const { data: allMembers, error: e3 } = await supabase
+    .from("conversation_members")
+    .select("conversation_id, user_id")
+    .in("conversation_id", ids);
+  if (e3) throw e3;
+
+  const memberIds = Array.from(new Set((allMembers ?? []).map((m) => m.user_id as string)));
+  const { data: profiles, error: e4 } = await supabase
+    .from("profiles")
+    .select("id, name, handle, avatar_hue")
+    .in("id", memberIds);
+  if (e4) throw e4;
+  const byId = new Map<string, MemberProfile>((profiles ?? []).map((p) => [p.id, p]));
+
+  return (convs ?? []).map((c) => ({
+    ...c,
+    members: (allMembers ?? [])
+      .filter((m) => m.conversation_id === c.id)
+      .map((m) => byId.get(m.user_id as string))
+      .filter((p): p is MemberProfile => !!p),
+  }));
 }
 
 export type DbMessage = {
