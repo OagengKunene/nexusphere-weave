@@ -1,13 +1,24 @@
 import { TrendingUp, UserPlus, Users, Calendar, Briefcase } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { trends, suggestedGroups, upcomingEvents, jobMatches } from "@/lib/mock-data";
-import { fetchSuggestedPeople, fetchMyFollowing } from "@/lib/api";
+import { trends } from "@/lib/mock-data";
+import {
+  fetchSuggestedPeople,
+  fetchMyFollowing,
+  fetchCommunities,
+  fetchEvents,
+  fetchJobs,
+  whenLabel,
+} from "@/lib/api";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar } from "./Avatar";
 
 export function RightRail() {
+  const { data: communities } = useQuery({ queryKey: ["communities"], queryFn: fetchCommunities });
+  const { data: events } = useQuery({ queryKey: ["events"], queryFn: fetchEvents });
+  const { data: jobs } = useQuery({ queryKey: ["jobs"], queryFn: fetchJobs });
+
   return (
     <>
       <RailCard title="Trending now" icon={TrendingUp}>
@@ -27,47 +38,65 @@ export function RightRail() {
       <PeopleToKnow />
 
       <RailCard title="Groups for you" icon={Users}>
-        <ul className="space-y-3">
-          {suggestedGroups.map((g) => (
-            <li key={g.name}>
-              <div className="font-medium">{g.name}</div>
-              <div className="text-xs text-muted-foreground">
-                {g.members} · {g.topic}
-              </div>
-            </li>
-          ))}
-        </ul>
+        {communities && communities.length > 0 ? (
+          <ul className="space-y-3">
+            {communities.slice(0, 3).map((g) => (
+              <li key={g.id}>
+                <Link to="/communities" className="block hover:text-foreground">
+                  <div className="font-medium">{g.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {g.community_members.length} member{g.community_members.length === 1 ? "" : "s"}
+                    {g.topic ? ` · ${g.topic}` : ""}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">No communities yet.</p>
+        )}
       </RailCard>
 
       <RailCard title="Upcoming events" icon={Calendar}>
-        <ul className="space-y-3">
-          {upcomingEvents.map((e) => (
-            <li key={e.title}>
-              <div className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
-                {e.when} {e.online ? "· Online" : "· In person"}
-              </div>
-              <div className="font-medium">{e.title}</div>
-              <div className="text-xs text-muted-foreground">Hosted by {e.host}</div>
-            </li>
-          ))}
-        </ul>
+        {events && events.length > 0 ? (
+          <ul className="space-y-3">
+            {events.slice(0, 3).map((e) => (
+              <li key={e.id}>
+                <Link to="/events" className="block hover:text-foreground">
+                  <div className="text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground">
+                    {whenLabel(e.when_at)} {e.online ? "· Online" : "· In person"}
+                  </div>
+                  <div className="font-medium">{e.title}</div>
+                  {e.host_name && (
+                    <div className="text-xs text-muted-foreground">Hosted by {e.host_name}</div>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">Nothing on the calendar.</p>
+        )}
       </RailCard>
 
-      <RailCard title="Job matches" icon={Briefcase}>
-        <ul className="space-y-3">
-          {jobMatches.map((j) => (
-            <li key={j.role}>
-              <div className="flex items-center justify-between gap-2">
-                <div className="font-medium truncate">{j.role}</div>
-                <span className="text-[0.68rem] text-signal font-medium">{j.match}%</span>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {j.company} · {j.location}
-              </div>
-              <div className="text-xs text-muted-foreground">{j.salary}</div>
-            </li>
-          ))}
-        </ul>
+      <RailCard title="Latest jobs" icon={Briefcase}>
+        {jobs && jobs.length > 0 ? (
+          <ul className="space-y-3">
+            {jobs.slice(0, 3).map((j) => (
+              <li key={j.id}>
+                <Link to="/jobs" className="block hover:text-foreground">
+                  <div className="font-medium truncate">{j.role}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {j.company} · {j.location}
+                  </div>
+                  {j.salary && <div className="text-xs text-muted-foreground">{j.salary}</div>}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-muted-foreground">No open roles yet.</p>
+        )}
       </RailCard>
 
       <p className="text-[0.65rem] text-muted-foreground leading-relaxed">
@@ -77,6 +106,7 @@ export function RightRail() {
     </>
   );
 }
+
 
 function PeopleToKnow() {
   const { user } = useAuth();
