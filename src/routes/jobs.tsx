@@ -12,6 +12,16 @@ export const Route = createFileRoute("/jobs")({
   component: Jobs,
 });
 
+function safeHttpUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function Jobs() {
   const { user } = useAuth();
   const qc = useQueryClient();
