@@ -76,26 +76,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "NexSphere — Where conversations build careers and communities" },
+      { title: "NexSphere — Careers, communities & live chat" },
       {
         name: "description",
         content:
-          "NexSphere is a hybrid social network combining live conversation, professional networking, and communities in one intent-aware feed.",
+          "NexSphere is a hybrid social network that blends live conversation, professional networking, and communities in one intent-ranked feed.",
       },
-      { property: "og:title", content: "NexSphere — Where conversations build careers and communities" },
+      { property: "og:site_name", content: "NexSphere" },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "NexSphere — Careers, communities & live chat" },
       {
         property: "og:description",
         content:
-          "One platform for careers, communities, and live conversation — ranked by what you're trying to do.",
+          "Live conversation, careers, and communities in one intent-ranked feed.",
       },
-      { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "NexSphere — Where conversations build careers and communities" },
-      { name: "description", content: "NexSphere is a hybrid social network combining live conversation, professional networking, and communities in one intent-aware feed." },
-      { property: "og:description", content: "NexSphere is a hybrid social network combining live conversation, professional networking, and communities in one intent-aware feed." },
-      { name: "twitter:description", content: "NexSphere is a hybrid social network combining live conversation, professional networking, and communities in one intent-aware feed." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9de3ec99-f718-4dad-92cc-aaaa648530aa/id-preview-9540f07d--35954651-8d2b-44dd-97b5-465522749b37.lovable.app-1783330291471.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9de3ec99-f718-4dad-92cc-aaaa648530aa/id-preview-9540f07d--35954651-8d2b-44dd-97b5-465522749b37.lovable.app-1783330291471.png" },
+      { name: "twitter:title", content: "NexSphere — Careers, communities & live chat" },
+      {
+        name: "twitter:description",
+        content:
+          "Live conversation, careers, and communities in one intent-ranked feed.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -105,6 +106,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "NexSphere",
+          url: "https://nexusphere-weave.lovable.app",
+          description:
+            "Hybrid social network blending live conversation, professional networking, and communities.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "NexSphere",
+          url: "https://nexusphere-weave.lovable.app",
+        }),
       },
     ],
   }),
