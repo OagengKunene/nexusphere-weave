@@ -10,6 +10,23 @@ import { Calendar, Video, MapPin, X } from "lucide-react";
 
 export const Route = createFileRoute("/events")({
   component: Events,
+  head: () => ({
+    meta: [
+      { title: "Events on NexSphere — Meetups, talks & webinars" },
+      {
+        name: "description",
+        content:
+          "Upcoming online and in-person events on NexSphere. RSVP to meetups, talks, and community webinars.",
+      },
+      { property: "og:title", content: "Events on NexSphere" },
+      {
+        property: "og:description",
+        content: "Upcoming meetups, talks, and webinars from the NexSphere community.",
+      },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/events" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/events" }],
+  }),
 });
 
 function Events() {
@@ -164,7 +181,7 @@ function HostEventModal({
       <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-baseline justify-between mb-4">
           <h2 className="font-display text-2xl">Host an event</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Close dialog" className="text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>

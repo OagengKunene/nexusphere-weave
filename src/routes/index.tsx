@@ -8,6 +8,24 @@ import { fetchPosts } from "@/lib/api";
 
 export const Route = createFileRoute("/")({
   component: Home,
+  head: () => ({
+    meta: [
+      { title: "NexSphere — Intent-ranked social feed" },
+      {
+        name: "description",
+        content:
+          "The NexSphere feed ranks live conversation, professional posts, and community updates by what you're trying to do right now.",
+      },
+      { property: "og:title", content: "NexSphere — Intent-ranked social feed" },
+      {
+        property: "og:description",
+        content:
+          "Live conversation, careers, and communities in one intent-ranked feed.",
+      },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/" }],
+  }),
 });
 
 const lanes = ["For you", "Professional", "Communities", "Trending", "Friends"] as const;

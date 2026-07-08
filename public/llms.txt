@@ -1,0 +1,14 @@
+# NexSphere
+
+> Hybrid social network blending live conversation, professional networking, and communities in one intent-ranked feed.
+
+NexSphere combines the speed of live conversation with professional networking and community spaces. Users share updates, apply for jobs, join communities, and RSVP to events from one intent-aware feed.
+
+## Pages
+
+- [Feed](/): Intent-ranked home feed of updates, articles, and projects.
+- [Explore](/explore): Trending topics and discovery across the platform.
+- [Jobs](/jobs): Job listings you can save and apply to.
+- [Communities](/communities): Public and private groups to join.
+- [Events](/events): Upcoming online and in-person events.
+- [Profile](/profile): Public professional profile view.

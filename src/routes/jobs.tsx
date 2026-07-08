@@ -10,6 +10,35 @@ import { MapPin, Building2, Sparkles, Bookmark, X } from "lucide-react";
 
 export const Route = createFileRoute("/jobs")({
   component: Jobs,
+  head: () => ({
+    meta: [
+      { title: "Jobs on NexSphere — Roles, skills & apply links" },
+      {
+        name: "description",
+        content:
+          "Browse open roles from the NexSphere community. Save jobs, follow skills, and apply directly from your professional feed.",
+      },
+      { property: "og:title", content: "Jobs on NexSphere" },
+      {
+        property: "og:description",
+        content: "Browse and apply to open roles shared by the NexSphere community.",
+      },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/jobs" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/jobs" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Jobs on NexSphere",
+          url: "https://nexusphere-weave.lovable.app/jobs",
+          description: "Open roles posted by the NexSphere community.",
+        }),
+      },
+    ],
+  }),
 });
 
 function safeHttpUrl(raw: string | null | undefined): string | null {
@@ -254,7 +283,7 @@ function PostJobModal({
       >
         <div className="flex items-baseline justify-between mb-4">
           <h2 className="font-display text-2xl">Post a job</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Close dialog" className="text-muted-foreground hover:text-foreground">
             <X className="h-5 w-5" />
           </button>
         </div>

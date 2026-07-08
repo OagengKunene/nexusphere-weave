@@ -82,15 +82,23 @@ export function LivePostCard({ post }: { post: DbPost }) {
       </div>
 
       <footer className="mt-4 pt-3 rule-top flex items-center justify-between text-muted-foreground text-sm">
-        <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60">
+        <button
+          aria-label="Comment on post"
+          className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60"
+        >
           <MessageCircle className="h-4 w-4" />
         </button>
-        <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60">
+        <button
+          aria-label="Repost"
+          className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60"
+        >
           <Repeat2 className="h-4 w-4" />
         </button>
         <button
           onClick={() => like.mutate()}
           disabled={!user || like.isPending}
+          aria-label={liked ? "Unlike post" : "Like post"}
+          aria-pressed={liked}
           className={
             "inline-flex items-center gap-1.5 px-2 py-1 rounded hover:bg-accent/60 transition " +
             (liked ? "text-heat" : "hover:text-foreground")
@@ -99,12 +107,18 @@ export function LivePostCard({ post }: { post: DbPost }) {
           <Heart className="h-4 w-4" fill={liked ? "currentColor" : "none"} />
           <span className="text-xs tabular-nums">{post.likes.length}</span>
         </button>
-        <button className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60">
+        <button
+          aria-label="Bookmark post"
+          className="inline-flex items-center gap-1.5 px-2 py-1 rounded hover:text-foreground hover:bg-accent/60"
+        >
           <Bookmark className="h-4 w-4" />
         </button>
-        <div className="hidden sm:flex items-center gap-1.5 text-xs">
+        <button
+          aria-label="Share post"
+          className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs hover:text-foreground hover:bg-accent/60"
+        >
           <Share2 className="h-4 w-4" />
-        </div>
+        </button>
       </footer>
     </article>
   );
