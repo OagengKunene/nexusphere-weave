@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /settings
+Disallow: /notifications
+Disallow: /messages
+Disallow: /saved
+
+Sitemap: https://nexusphere-weave.lovable.app/sitemap.xml

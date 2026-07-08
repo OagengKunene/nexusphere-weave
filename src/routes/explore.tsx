@@ -6,6 +6,23 @@ import { Flame, Newspaper, Code2, Trophy, Palette, Briefcase } from "lucide-reac
 
 export const Route = createFileRoute("/explore")({
   component: Explore,
+  head: () => ({
+    meta: [
+      { title: "Explore NexSphere — Trending topics & voices" },
+      {
+        name: "description",
+        content:
+          "Explore trending topics across technology, design, careers, sports, news, and culture on NexSphere.",
+      },
+      { property: "og:title", content: "Explore NexSphere" },
+      {
+        property: "og:description",
+        content: "Trending topics and voices across NexSphere.",
+      },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/explore" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/explore" }],
+  }),
 });
 
 const topics = [

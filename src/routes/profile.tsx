@@ -8,6 +8,31 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/profile")({
   component: Profile,
+  head: () => ({
+    meta: [
+      { title: `${profile.name} — NexSphere profile` },
+      { name: "description", content: profile.headline },
+      { property: "og:title", content: `${profile.name} — NexSphere profile` },
+      { property: "og:description", content: profile.headline },
+      { property: "og:type", content: "profile" },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/profile" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/profile" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          mainEntity: {
+            "@type": "Person",
+            name: profile.name,
+            description: profile.headline,
+          },
+        }),
+      },
+    ],
+  }),
 });
 
 const tabs = ["Overview", "Professional", "Portfolio", "Social"] as const;

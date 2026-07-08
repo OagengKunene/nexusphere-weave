@@ -10,6 +10,34 @@ import { Lock, Globe, X } from "lucide-react";
 
 export const Route = createFileRoute("/communities")({
   component: Communities,
+  head: () => ({
+    meta: [
+      { title: "Communities on NexSphere — Join groups & rooms" },
+      {
+        name: "description",
+        content:
+          "Discover public and private communities on NexSphere. Join groups for design, engineering, careers, and more.",
+      },
+      { property: "og:title", content: "Communities on NexSphere" },
+      {
+        property: "og:description",
+        content: "Public and private communities to join on NexSphere.",
+      },
+      { property: "og:url", content: "https://nexusphere-weave.lovable.app/communities" },
+    ],
+    links: [{ rel: "canonical", href: "https://nexusphere-weave.lovable.app/communities" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Communities on NexSphere",
+          url: "https://nexusphere-weave.lovable.app/communities",
+        }),
+      },
+    ],
+  }),
 });
 
 function Communities() {
