@@ -223,6 +223,10 @@ function PostJobModal({
       if (!role.trim() || !company.trim() || !location.trim()) {
         throw new Error("Role, company, and location are required.");
       }
+      const trimmedUrl = applyUrl.trim();
+      if (trimmedUrl && !safeHttpUrl(trimmedUrl)) {
+        throw new Error("Apply URL must start with http:// or https://");
+      }
       const { error } = await supabase.from("jobs").insert({
         posted_by: userId,
         role: role.trim(),
