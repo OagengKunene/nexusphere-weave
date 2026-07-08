@@ -136,14 +136,26 @@ function Jobs() {
                         <Bookmark className="h-3.5 w-3.5" fill={isSaved ? "currentColor" : "none"} />
                         {isSaved ? "Saved" : "Save"}
                       </button>
-                      <a
-                        href={j.apply_url ?? "#"}
-                        target={j.apply_url ? "_blank" : undefined}
-                        rel="noreferrer"
-                        className="text-xs px-3 py-1.5 rounded-md bg-signal text-signal-foreground font-medium hover:brightness-95 transition"
-                      >
-                        Apply
-                      </a>
+                      {(() => {
+                        const safe = safeHttpUrl(j.apply_url);
+                        return (
+                          <a
+                            href={safe ?? "#"}
+                            target={safe ? "_blank" : undefined}
+                            rel="noreferrer noopener"
+                            aria-disabled={!safe}
+                            onClick={(e) => {
+                              if (!safe) e.preventDefault();
+                            }}
+                            className={
+                              "text-xs px-3 py-1.5 rounded-md bg-signal text-signal-foreground font-medium hover:brightness-95 transition " +
+                              (safe ? "" : "opacity-50 cursor-not-allowed")
+                            }
+                          >
+                            Apply
+                          </a>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
